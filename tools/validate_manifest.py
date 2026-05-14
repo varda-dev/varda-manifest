@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from __future__ import annotations
 
 import json
+import glob
 import sys
 from pathlib import Path
 
@@ -50,8 +51,15 @@ def main() -> int:
 
   validator = Draft202012Validator(schema, format_checker=FormatChecker())
   ok = True
-
+  inputs = []
   for arg in sys.argv[1:]:
+    matches = glob.glob(arg)
+    if matches:
+      inputs.extend(matches)
+    else:
+      inputs.append(arg)
+
+  for arg in inputs:
     path = Path(arg)
     try:
       instance = load_json(path)

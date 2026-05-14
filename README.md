@@ -1,48 +1,137 @@
 # Varda Manifest
 
-`varda-manifest` is source of truth for Varda server manifest JSON contract.
+`varda-manifest` defines the JSON Schema contract for the Varda server manifest.
 
-- Current schema file: `manifest.schema.json`
-- Current schema version: `2`
-- Producer: `varda-modpack`
-- Consumer: `varda-server-installer`
+The schema is used by:
 
-This repo defines shared shape for manifest emitted by modpack and read by installer. Installer-specific safety logic still lives in installer code.
+- `varda-modpack` to validate the manifest it produces
+- `varda-server-installer` to understand the manifest shape it consumes
 
-## Validate
+## Schema
+
+Canonical source:
+
+```text
+manifest.schema.json
+```
+
+Published GitHub Pages copy:
+
+```text
+docs/manifest.schema.json
+```
+
+Public URL:
+
+```text
+https://varda-dev.github.io/varda-manifest/manifest.schema.json
+```
+
+Current schema version:
+
+```text
+2
+```
+
+The root `manifest.schema.json` file is the source of truth. The copy under `docs/` exists only so GitHub Pages can publish it.
+
+## Setup
+
+Install the Python validation dependency:
 
 ```powershell
 python -m pip install jsonschema
-python tools/validate_manifest.py examples/manifest.example.json
-python tools/validate_manifest.py testdata/valid/manifest.v2.json
 ```
 
-## Integration
+The helper scripts are plain Python scripts and do not require this repo to be installed as a package.
+
+## Scripts
+
+### `tools/sync_docs.py`
+
+Copies the canonical schema into the GitHub Pages directory.
+
+Run this after editing `manifest.schema.json`:
+
+```powershell
+python tools/sync_docs.py
+```
+
+It updates:
+
+```text
+docs/manifest.schema.json
+docs/index.html
+docs/.nojekyll
+```
+
+### `tools/validate_manifest.py`
+
+Validates one or more manifest JSON files against the root schema.
+
+Run:
+
+```powershell
+python tools/validate_manifest.py examples/manifest.example.json testdata/valid/manifest.v2.json
+```
+
+Expected output:
+
+```text
+OK: examples/manifest.example.json
+OK: testdata/valid/manifest.v2.json
+```
+
+Validate the intentionally invalid fixtures:
+
+```powershell
+python tools/validate_manifest.py testdata/invalid/*.json
+```
+
+That command is expected to fail. Those files exist to prove the schema rejects bad manifests.
+
+## Normal workflow
+
+Before committing schema changes, run:
+
+```powershell
+python tools/sync_docs.py
+python tools/validate_manifest.py examples/manifest.example.json testdata/valid/manifest.v2.json
+python tools/validate_manifest.py testdata/invalid/*.json
+```
+
+The first validation command should pass.
+
+The invalid fixture command should fail.
+
+## Consumer guidance
 
 ### `varda-modpack`
 
-- Generate `docs/manifest.json`.
-- Validate generated file against `manifest.schema.json` before publish.
-- Start by copying this schema repo or pinning it as submodule/vendor copy.
-- Do not publish if validation fails.
+`varda-modpack` should validate its generated `docs/manifest.json` before publishing.
+
+Recommended schema URL:
+
+```text
+https://varda-dev.github.io/varda-manifest/manifest.schema.json
+```
+
+If validation fails, the manifest should not be published.
 
 ### `varda-server-installer`
 
-- Keep Go structs local for now.
-- Add tests that load valid and invalid fixtures from this repo or a pinned copy.
-- Installer-specific safety checks remain in installer code:
-  - safe inferred jar filenames
-  - ZIP traversal checks
-  - application of manifest to filesystem
-- JSON Schema is shared contract; installer code still owns installation behavior.
+`varda-server-installer` should not fetch the schema at runtime.
 
-## Compatibility Policy
+The installer should stay self-contained and keep its own Go validation for installer-specific behavior, such as:
 
-- Additive optional fields should be added carefully and tested.
-- `schema_version` should only change when old consumers must reject manifest.
-- Do not change existing required field meaning without schema version bump.
-- Tag this repo when schema changes release.
+- safe inferred `.jar` filenames
+- ZIP traversal protection
+- applying the manifest to the server directory
 
-## Validation Script
+## Compatibility policy
 
-`tools/validate_manifest.py` validates one or more manifest files against schema. It prints `OK: <path>` for valid files and readable errors for invalid files.
+Only bump `schema_version` when old consumers must reject the manifest.
+
+Safe changes usually include adding optional fields. Unsafe changes include changing the meaning of required fields, removing required fields, or changing hash/URL semantics.
+
+Tag this repo when releasing schema changes.

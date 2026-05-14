@@ -5,10 +5,12 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schema_version",
-    "pack",
     "version",
+    "pack",
+    "schema_version",
+    "minecraft",
     "neoforge",
+    "server_config",
     "mods"
   ],
   "properties": {
@@ -30,12 +32,29 @@
       "type": "string",
       "minLength": 1
     },
+    "server_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "sha1"
+      ],
+      "properties": {
+        "url": {
+          "$ref": "#/$defs/httpZipUrl"
+        },
+        "sha1": {
+          "$ref": "#/$defs/sha1"
+        }
+      }
+    },
     "neoforge": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "version",
-        "installer_url"
+        "installer_url",
+        "sha1"
       ],
       "properties": {
         "version": {
@@ -43,19 +62,7 @@
           "minLength": 1
         },
         "installer_url": {
-          "$ref": "#/$defs/httpUrl"
-        },
-        "sha1": {
-          "$ref": "#/$defs/sha1"
-        }
-      }
-    },
-    "server_config": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "url": {
-          "$ref": "#/$defs/httpOrFileUrl"
+          "$ref": "#/$defs/httpJarUrl"
         },
         "sha1": {
           "$ref": "#/$defs/sha1"
@@ -69,8 +76,11 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "name",
           "url",
-          "sha1"
+          "website_url",
+          "sha1",
+          "size"
         ],
         "properties": {
           "name": {
@@ -78,7 +88,7 @@
             "minLength": 1
           },
           "url": {
-            "$ref": "#/$defs/httpOrFileJarUrl"
+            "$ref": "#/$defs/httpJarUrl"
           },
           "website_url": {
             "$ref": "#/$defs/httpUrl"
@@ -88,7 +98,7 @@
           },
           "size": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 1
           }
         }
       }
@@ -104,13 +114,15 @@
       "format": "uri",
       "pattern": "^https?://"
     },
-    "httpOrFileUrl": {
+    "httpJarUrl": {
       "type": "string",
-      "pattern": "^(?:https?|file):"
+      "format": "uri",
+      "pattern": "^https?://.*\\.[jJ][aA][rR](?:[?#].*)?$"
     },
-    "httpOrFileJarUrl": {
+    "httpZipUrl": {
       "type": "string",
-      "pattern": "^(?:https?|file):.*\\.[jJ][aA][rR](?:[?#].*)?$"
+      "format": "uri",
+      "pattern": "^https?://.*\\.[zZ][iI][pP](?:[?#].*)?$"
     }
   }
 }

@@ -1,18 +1,24 @@
 {
-  "schema_version": 2,
+  "version": "0.1.12",
   "pack": "varda",
-  "version": "0.1.4",
+  "schema_version": 2,
   "minecraft": "1.21.1",
   "neoforge": {
-    "version": "21.1.228",
-    "installer_url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.228/neoforge-21.1.228-installer.jar",
+    "version": "21.1.229",
+    "installer_url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.229/neoforge-21.1.229-installer.jar",
     "sha1": "not-a-sha1"
+  },
+  "server_config": {
+    "url": "https://github.com/varda-dev/varda-modpack/releases/download/v0.1.12/varda-server-config-0.1.12.zip",
+    "sha1": "09f9f4c284d25ac00a6f3f53bd8e5dc5a8c6f41f"
   },
   "mods": [
     {
-      "name": "Example Mod",
-      "url": "https://example.invalid/mods/example-mod-1.0.0.jar",
-      "sha1": "fedcba9876543210fedcba9876543210fedcba98"
+      "name": "Almost Unified",
+      "url": "https://edge.forgecdn.net/files/7873/439/almostunified-neoforge-1.21.1-1.4.1.jar",
+      "website_url": "https://www.curseforge.com/minecraft/mc-mods/almostunified",
+      "sha1": "69913ae6d63f2e10603b272bb8a957c7d0f3f0e4",
+      "size": 295072
     }
   ]
 }
